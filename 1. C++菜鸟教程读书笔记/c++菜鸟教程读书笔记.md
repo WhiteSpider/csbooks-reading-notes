@@ -130,6 +130,205 @@
 * struct也可以包含方法实现
 * 换而言之，通过struct完全可以体现面向对象的编程思想。但是，C++中面向对象思想的关键词可以提供更精细、更自然的控制方式，例如：private, public, protected 等访问权限控制。
 
+## 3. C++中的面向对象编程
+**类的基本知识**
+* 面向对象理念中几个概念：
+    * 万物都是对象，对象有其生命的周期，包含: 产生、变化、消亡。
+    * 对象由静态的属性、动态的行为或者功能构成，对象都从属于一定的类。所以，产生对象之前必须要先定义类。类是对象的模板，对象是类的实例。
+    * 使用一个类可以产生多个对象，每个对象都拥有自己的实例数据和方法，这些数据和方法又称为实例成员。实例数据叫做“属性成员、数据成员”，实例方法又称为“成员函数”。在C++的实现中，每个对象有各自的数据成员副本、但是共用函数成员副本。
+    * 成员修饰符：public，private，protected。public：所有其他对象或者方法可以使用该成员；private：所属对象函数才可以访问；protected：所属对象函数、其派生类对象函数可以访问。
+    * 构造函数：在产生一个新的对象时被自动调用的函数，例如：一个小孩出生，就构造了一个新的生命，他拥有一定的属性，例如：50cm长，8斤重等等。
+    * 析构函数：一个对象在消亡前调用的函数, 主要用于清理一些占用的资源。
+    * C++的静态成员：类中定义的静态数据成员，会被保存到全局数据区，这个区域又称为静态/全局数据区； 类中定义的静态方法（method），它不需要产生对象就可以直接使用，使用方法为，类名::静态成员函数，例如： Box::getCount;
+
+**继承**
+* 反映面向对象的is a 关系，是面向对象编程思想三大基石：封装、继承和多态中的重要一环。是面向对象软件重用的基石。
+* 继承类通过public，protected，private关键词从基类中继承其方法和属性，但是一般只会用public继承。
+* 多重继承：从多个基类中继承属性和方法。
+
+**运算符重载和函数重载**
+* 运算符重载：赋予常用的运算符，例如 +， -， *， / 针对不同的数据类型具有新的含义。
+* 函数重载（重载，overload）：在一个类中可以定义多个同名的函数，但是，这些函数的签名（signature)必须不同。签名的形式是： 函数名(参数1的类型，参数2的类型，..., 参数n的类型)。本质上，函数重载是多态的一种体现，而且是“编译时多态”。
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class printData
+    {
+    public:
+        void print(int i) { // print(int), 实际编译器函数名为：print_int
+            cout << "Integer " << i << endl;
+        }
+
+        void print(double  f) { // print(double), 实际编译器函数名为：print_double
+            cout << "float: " << f << endl;
+        }
+
+        void print(char c[]) { // print(char), 实际编译器函数名为：print_char
+            cout << "string: " << c << endl;
+        }
+        void print(int a, int b){ // print(int, int), 实际编译器函数名为：print_int_int
+
+        }
+        void print(int a, double b){ // print(int, double), 实际编译器函数名为：print_int_double
+
+        }
+        void print(double a, int b){ // print(double, int), 实际编译器函数名为：print_double_int
+
+        }
+    };
+
+    int main(void)
+    {
+        printData pd;
+
+        // 输出整数
+        pd.print(5);
+        // 输出浮点数
+        pd.print(500.263);
+        // 输出字符串
+        char c[] = "Hello C++";
+        pd.print(c);
+
+        return 0;
+    }
+    ```
+
+**运行时多态（覆盖，override）**
+* 覆盖是一种运行时多态：存在于父子类中的同名函数（具有完全相同的signature）。必须在父类函数前使用关键词virtual 修饰。
+* 编译器在编译期间不能确定具体的调用函数，需要在执行时由执行环境的上下文来确定。所以称为运行时多态。
+* 如果一个类中包含纯虚函数（只有函数声明，没有函数实现）的话，这个类是不完整的，不能用于产生具体的实例（对象），只可以用来被继承或者扩展。含有纯虚函数的类叫做抽象类。
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Shape {
+    protected:
+        int width, height;
+    public:
+        Shape( int a=0, int b=0)
+        {
+            width = a;
+            height = b;
+        }
+        virtual int area() // area()
+        {
+            cout << "Parent class area :" <<endl;
+            return 0;
+        }
+    };
+    class Rectangle: public Shape{
+    public:
+        Rectangle( int a=0, int b=0):Shape(a, b) { }
+        virtual  int area () // area()
+        {
+            cout << "Rectangle class area :" <<(width * height)<<endl;
+            Shape::area();
+            return (width * height);
+        }
+    };
+    class Triangle: public Shape{
+    public:
+        Triangle( int a=0, int b=0):Shape(a, b) { }
+        virtual  int area ()
+        {
+            cout << "Triangle class area :" << (width * height / 2)<<endl;
+            return (width * height / 2);
+        }
+    };
+    // 程序的主函数
+    int main( )
+    {
+        Shape *shape;
+        Rectangle rec(10,7);
+        Triangle  tri(10,5);
+
+        // 存储矩形的地址
+        shape = &rec;
+        // 调用矩形的求面积函数 area
+        shape->area();
+
+        // 存储三角形的地址
+        shape = &tri;
+        // 调用三角形的求面积函数 area
+        shape->area();
+
+        return 0;
+    }
+    ```
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Shape {
+    protected:
+        int width, height;
+    public:
+        Shape( int a=0, int b=0)
+        {
+            width = a;
+            height = b;
+        }
+        virtual int area() = 0;
+    };
+    class Rectangle: public Shape{
+    public:
+        Rectangle( int a=0, int b=0):Shape(a, b) { }
+        virtual  int area () // area()
+        {
+            cout << "Rectangle class area :" <<(width * height)<<endl;
+            //Shape::area();
+            return (width * height);
+        }
+    };
+    class Triangle: public Shape{
+    public:
+        Triangle( int a=0, int b=0):Shape(a, b) { }
+        virtual  int area ()
+        {
+            cout << "Triangle class area :" << (width * height / 2)<<endl;
+            return (width * height / 2);
+        }
+    };
+    // 程序的主函数
+    int main( )
+    {
+        Shape *shape;
+        Rectangle rec(10,7);
+        Triangle  tri(10,5);
+    //    Shape sp;
+
+
+        // 存储矩形的地址
+        shape = &rec;
+        // 调用矩形的求面积函数 area
+        shape->area();
+
+        // 存储三角形的地址
+        shape = &tri;
+        // 调用三角形的求面积函数 area
+        shape->area();
+
+        return 0;
+    }
+    ```
+**封装**
+* 主要体现为以下几种：
+    * 把数据和方法用class包在一起定义类。
+    * 对数据和方法通过public，protected，privat等进行访问权限控制（读和写）。
+* 设计策略： 套用童安格的一首歌《无泪有伤》中的一句歌词：“所谓成熟就是学会隐藏”。也就是：尽量使用private来修饰没有必要往外暴露的数据和方法。
+
+**接口实现**
+* 接口（interface）：就是规则。例如：插座接口包含：电压，插脚数目，供电功能。
+* C++中使用抽象类来实现接口定义。即使用Abastract Class来实现接口，Java中使用关键词 interface 来到定义接口。
+
+**异常**
+* 异常就是不正常，指程序执行过程中出现不正常或者错误。
+* 异常处理可以针对这些异常提供合适的处理方式，增强程序的健壮性。
+* 使用try...catch关键词进行异常处理， 通过throw关键词可以抛出异常对象。
+* C++提供的异常基础类为Exception，程序员可以通过扩展Exception类来产生符合自己程序的异常处理体系。
 
 
 
