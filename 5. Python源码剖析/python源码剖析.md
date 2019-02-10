@@ -173,8 +173,14 @@ typedef struct {
 * python线程可以在指令执行完毕后被切换，也可以通过sleep主动或者其他条件下的被动线程切换，例如：通过sleep要求主动切换，通过I/O操作被动切换。在切换时需要先释放GIL。在sleep、I/O操作被动切换情况下， pyc指令执行计数器不会被重置为100（因为是他主动放弃一部分执行时间）。
 * GIL级别的互斥可以看做python 内核级别的互斥，使得对python解释器，python提供的C API（python C扩展吧，我不确定）的访问时互斥的。在python线程之上的共享数据可以看做“用户级数据互斥”。这种需要使用常规的Lock锁机制。在获取Lock前先通过Py_BEGIN_ ALLOW_THREADS释放GIL，免得引发死锁。等获得用户级Lock之后，再通过Py_BEGIN_ALLOW_THREADS竞争获取GIL。
 ### 4.4 Python的内存管理机制
-* 
+* pvm的内存管理机制，在c的内存库之上，通过自己提供的内存管理进行设计。结构如下：
+![](2019-02-10-14-48-02.png) 
+* 可以这样理解：python在操作系统的c lib的基础上先从堆中申请一大段内存，用于构建pyc代码执行过程中所需要用到的各种高层python对象，例如：数字、list、tuple、map、class对象、function对象、module对象等。以及构建python解释器执行环境，例如：栈帧等。
+* python对象包括栈帧在内一直使用的系统内存为“堆”内存。而PVM中针对pyc字节码之类的解释程序，采用的是c程序，其使用的系统内存有系统“栈”和系统“堆”。
+
+
 ***
+
 **其他链接**
 1. [暨南大学](https://www.jnu.edu.cn/)
 2. [林龙新的教学网站](https://icerg.longxinlin.com)
