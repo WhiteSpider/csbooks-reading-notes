@@ -2,7 +2,7 @@
 ## 参考内容
 [Python源码剖析](https://read.douban.com/ebook/1499455/)
 
-![](2019-02-10-09-18-10.png)
+<br>![](2019-02-10-09-18-10.png)
 ## 1. Cpython源码和架构
 ### 1.1 CPython总体架构
 Cpython是python语言最常用的解释器，是用C语言编写的。
@@ -158,6 +158,46 @@ typedef struct {
     ```
 ![](2019-02-10-11-15-48.png)
 ### 3.3 虚拟中的一般表达式
+* 简单对象创建，例如：
+    ```python
+    i = 1
+    s = "Python"
+    d = {}
+    l = []
+    ```
+    ```python
+    i = 1
+    0   LOAD_CONST   0  (1)
+    3   STORE_NAME   0  (i)
+    ```
+
+    ```c++
+    [LOAD_CONST]
+    x = GETITEM(consts, oparg);
+    Py_INCREF(x);
+    PUSH(x);
+
+    [STORE_NAME]
+    //从符号表中获得符号，其中oparg = 0
+    w = GETITEM(names, oparg);
+    //从运行时栈中获得值
+    v = POP();
+    if ((x = f->f_locals) != NULL) 
+    {
+        //将（符号，值）的映射关系存储到local名字空间中
+        if (PyDict_CheckExact(x))
+        {
+            PyDict_SetItem(x, w, v);
+        }
+        else
+        {
+            PyObject_SetItem(x, w, v);
+        }
+        Py_DECREF(v);
+    }
+    ```
+    上述中， LOAD_CONST, STORE_NAME 就是pyc中的字节码指令，每条指令对应一定的pvm 中的c函数进行解释执行。每条pyc字节码指令必须要受到GIL保护执行，换句话说，pyc指令在python线程级别是原子方式执行。当然，由于每条pyc指令对应数条本地机器指令，故在pyc指令的执行过程中可以被操作系统切换到其他非本python解析器管辖线程。
+    
 ### 3.4 虚拟机中的控制流
 ### 3.5 虚拟机中的函数
 ### 3.6 虚拟机中的类机制
@@ -166,7 +206,6 @@ typedef struct {
 
 ## 4. Cpython的高级话题
 ### 4.1 Python运行环境初始化
-* 
 ### 4.2 Python模块的动态加载
 ### 4.3 Python多线程机制
 * python提供GIL作为全局锁来互斥不同线程对“解释器”的使用， python线程获得PVM解释器后执行100条pyc指令后，将强制挂起当前线程，切换到下一个处于等待状态的线程。下一个处于调度的线程完全由操作系统决定。
