@@ -114,6 +114,78 @@
 * 函数的传值和传地址： 传值就是把实际参数的值拷贝一份给形式参数， 传地址是把实际参数的内存地址拷贝一份给形式参数。 
 * 传地址又可以分为两类：通过指针和引用。
 * 指针和引用的区别： 指针就是一个变量或者对象的内存起始地址，引用类似于生活中物体的名称（例如：别名），对引用的使用会作用到具体的对象上。 指针变量可以指向不同的对象，而引用变量只能够在定义时指向一个确定的对象，并且在使用过程中不允许更改。
+* 在c/c++ 中， 加入函数A要调用函数B，过程如下： 
+    * 在栈中保留函数A在调用前的各种现场数据，例如各种重要寄存器、调用函数B后的下一条指令地址等。
+    * 把调用B的实际参数入栈
+    * 把B中的局部变量入栈
+    * 执行函数B
+    * 函数B执行结束后，把函数B的局部变量、实际参数等退栈，并把函数调用的返回值通过eax寄存器返回到上一层。
+* 如果函数B的返回值是64位以下长度的数据，上述过程就OK了。如果返回值是结构体数据，大于64位的数据，则其返回值需要用到A的一个临时数据区，这个临时数据区是在A的栈帧内分配，通过eax寄存器传入到B函数，B函数中调用 return 结构体对象; 语句时，会把相应的值赋值到A中的临时数据区。A中使用B的返回值时，再通过eax从此临时数据区复制其到A中的具体的结构体类型变量中。
+    ```c++
+    #include <iostream>
+
+    using namespace std;
+
+    typedef struct numbers {
+        int number1;
+        int number2;
+        int number3;
+        int number4;
+    } Numbers;
+
+    int add(int i, int j) {
+        int result;
+        result = i + j;
+        return result;
+    }
+
+    Numbers numbers_add(Numbers i, Numbers j) {
+        Numbers result;
+        result.number1 = i.number1 + j.number1;
+        result.number2 = i.number2 + j.number2;
+        result.number3 = i.number3 + j.number3;
+        result.number4 = i.number4 + j.number4;
+        return result;
+    }
+
+    int main() {
+
+        int n1, n2, n3;
+        n1 = 10;
+        n2 = 20;
+        n3 = add(n1, n2);
+        /* 说明如下：
+         *     1. 实参n1, n2 入栈，局部变量 result 入栈。
+         *     2. 计算n1+n2的值，赋值给result变量
+         *     3. 遇到return result语句时，把result值赋值给eax寄存器
+         *     4. 出栈释放掉n1,n2,result变量。
+         *     5. 复制eax变量的值给n3, 使得n3的值等于n1+n2。 
+         */
+        cout << "n3=" << n3 << endl;
+        
+        Numbers numbers1, numbers2, numbers3;
+        numbers1 = {10, 20, 30, 40};
+        numbers2 = {110, 120, 130, 140};
+        numbers3 = numbers_add(numbers1, numbers2);
+        /* 说明如下：
+         *     1. 在main方法栈区临时分配可以容纳一个Numbers结构对象的临时变量，并且把其起始地址存入eax寄存器。
+         *     2. 把实参numbers1, numbers2入栈，局部变量 result 入栈。
+         *     2. 计算numbers1 + numbers2的值，赋值给result变量
+         *     3. 遇到return result语句时，把result值赋值给eax寄存器指向的Numbers的临时变量。
+         *     4. 出栈释放掉n1,n2,result变量。
+         *     5. 通过eax变量把eax指向的零食变量的值赋值给numbers3, 使得numbers3的值等于numbers1 + numbers2。 
+         */
+
+        cout << "numbers=" << "(" << numbers3.number1 << "," << numbers3.number2 << ","
+            << numbers3.number3 << "," << numbers3.number4 << ")" << endl;
+
+        return 0;
+    }
+
+
+
+    ```
+
 
 **C++数组**
 * 数据和数据之间经常呈现某些共性的关系，我们把这种关系叫做数据结构，常见的有三大类： 线性结构、树状结构、图状结构。
