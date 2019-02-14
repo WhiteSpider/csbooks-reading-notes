@@ -173,7 +173,7 @@
          *     2. 计算numbers1 + numbers2的值，赋值给result变量
          *     3. 遇到return result语句时，把result值赋值给eax寄存器指向的Numbers的临时变量。
          *     4. 出栈释放掉n1,n2,result变量。
-         *     5. 通过eax变量把eax指向的零食变量的值赋值给numbers3, 使得numbers3的值等于numbers1 + numbers2。 
+         *     5. 通过eax变量把eax指向的临时变量的值赋值给numbers3, 使得numbers3的值等于numbers1 + numbers2。 
          */
 
         cout << "numbers=" << "(" << numbers3.number1 << "," << numbers3.number2 << ","
