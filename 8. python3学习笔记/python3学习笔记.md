@@ -13,7 +13,69 @@
 * 所有类共有1个祖先类，即object
 * 所有类型也只是个类型对象，它的类型是"type"。 type的类型是type，object的类型也是type。type的基类是object， object的基类没有。总结一下：python类的体系中，object是root类。 所有类型都是type类型的实例。type是type和object的实例。哈哈，太绕了。 type类型又称为 metaclass。
 * 类型对象属于创建者的角色存在，由解释器首次载入时自动生成，生命周期与进程同步，而且属于“单例模式”。
-## 3. 表达式
+* 变量名其实就是内存的别名， 在python中，任何变量等价于c/c++中的指针，当然在访问的时候采用类似C++引用的方式，和C++引用不同的是：C++中的引用初始化指向一个对象后，不可以再改变了，而python中的变量可以指向不同的对象。
+* 动态语言中，名字和对象通常是两个运行期的实体。
+```python
+x = 100
+x +=2  # 1. 准备好目标对象100 
+       # 2. 准备好名字x（在python函数的栈帧中分配，栈帧属于系统的堆内存。
+       # 3. 在名字空间中建立两者的练习 : namespace {x:100}
+       # 4. 名字空间，namespace 是上下文环境中专门用来存储名字和目标引用关联的容器。
+```
+* 对python而言，每个模块（源文件）都有一个全局名字空间，根据代码作用域，例如：函数， 代码块{}， 又有当前名字空间和子名字空间说法，即嵌套的名字空间。名字空间默认使用字典数据结构以 key/value 的方式存储这种关联。 内置函数globals和locals分别返回全局名字空间和本地名字空间信息。
+```python
+def add(x, y):
+    def yes(x1, y1):
+        print(x, y)
+        print(x1, y1)
+        print("the locals of yes function:")
+        print(locals())
+        print("the globals of yes function:")
+        print(globals())
+
+    yes(15, 60)
+
+    result = x + y
+    print()
+    print("the locals of add function:")
+    print(locals())
+    print("the globals of add function:")
+    print(globals())
+
+
+add(90, 100)
+
+print("the locals of module")
+print(locals())
+
+print("the globals of module")
+print(globals())
+```
+```
+H:\my-workspace\python-workspace\python-study\venv\Scripts\python.exe H:/my-workspace/python-workspace/python-study/part1-basics/chap01.py
+90 100
+15 60
+the locals of yes function:
+{'x1': 15, 'y1': 60, 'x': 90, 'y': 100}
+the globals of yes function:
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x016CEE30>, '__spec__': None, '__annotations__': {}, '__builtins__': <module 'builtins' (built-in)>, '__file__': 'H:/my-workspace/python-workspace/python-study/part1-basics/chap01.py', '__cached__': None, 'add': <function add at 0x01E496A8>}
+
+the locals of add function:
+{'yes': <function add.<locals>.yes at 0x01E49858>, 'result': 190, 'x': 90, 'y': 100}
+the globals of add function:
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x016CEE30>, '__spec__': None, '__annotations__': {}, '__builtins__': <module 'builtins' (built-in)>, '__file__': 'H:/my-workspace/python-workspace/python-study/part1-basics/chap01.py', '__cached__': None, 'add': <function add at 0x01E496A8>}
+the locals of module
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x016CEE30>, '__spec__': None, '__annotations__': {}, '__builtins__': <module 'builtins' (built-in)>, '__file__': 'H:/my-workspace/python-workspace/python-study/part1-basics/chap01.py', '__cached__': None, 'add': <function add at 0x01E496A8>}
+the globals of module
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x016CEE30>, '__spec__': None, '__annotations__': {}, '__builtins__': <module 'builtins' (built-in)>, '__file__': 'H:/my-workspace/python-workspace/python-study/part1-basics/chap01.py', '__cached__': None, 'add': <function add at 0x01E496A8>}
+
+Process finished with exit code 0
+```
+* 名字空间结论： 函数中的locals包含其内部定义的局部变量 + 从上层函数可见的局部变量， 函数中的globals就是指函数所在模块的globals；模块的locals和globals是一样的。
+![](2019-02-16-13-12-21.png)
+* 所以，可以通过修改名字空间来建立关联引用。例如： globals()["hello"] = "hello world!", 不过一般不建议这么做。
+* 必须使用 is 来判定两个名字是否引用了同一个对象。
+
 ## 4. 函数
 ## 5. 迭代器
 ## 6. 模块
