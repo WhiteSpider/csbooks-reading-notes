@@ -1,5 +1,3 @@
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"> </script>
-
 # AI相关数学基础
 ## 参考内容
 [1] 极客时间：《人工智能基础》, 王天一
@@ -303,3 +301,4 @@ $H(p) = -\sum\limits_{x, y} \tilde p(x) p(y|x) \log_2 p(y|x)$，式中，$p(y|x)
 * 符号主义思路更接近人类认知思路，对形式逻辑的处理能否成为依赖小数据学习的AI的核心技术？
 
 
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"> </script>
