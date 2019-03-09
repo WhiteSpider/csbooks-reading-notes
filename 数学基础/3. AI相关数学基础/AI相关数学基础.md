@@ -300,5 +300,3 @@ $H(p) = -\sum\limits_{x, y} \tilde p(x) p(y|x) \log_2 p(y|x)$，式中，$p(y|x)
 * 不完备性定理向“认知的本质是计算”提出挑战
 * 符号主义思路更接近人类认知思路，对形式逻辑的处理能否成为依赖小数据学习的AI的核心技术？
 
-
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"> </script>
