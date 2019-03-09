@@ -1,3 +1,5 @@
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+
 # AI相关数学基础
 ## 参考内容
 [1] 极客时间：《人工智能基础》, 王天一
