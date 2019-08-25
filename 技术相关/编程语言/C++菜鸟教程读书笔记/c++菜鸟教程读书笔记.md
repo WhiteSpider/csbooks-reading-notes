@@ -1,6 +1,7 @@
 # C++ 菜鸟教程读书笔记
 ## 参考内容
 [C++教程|菜鸟教程](http://www.runoob.com/cplusplus/cpp-tutorial.html)
+[google c++ 编码规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-cpp-styleguide/)
 ## 1. C++简介
 ### 1.1 基本特征
 * C++是静态，编译性程序
